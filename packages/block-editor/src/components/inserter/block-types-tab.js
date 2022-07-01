@@ -14,6 +14,7 @@ import { useAsyncList } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockTypesList from '../block-types-list';
+import WorkflowsList from '../workflows-list';
 import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
@@ -36,10 +37,8 @@ export function BlockTypesTab( {
 	onHover,
 	showMostUsedBlocks,
 } ) {
-	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
-		rootClientId,
-		onInsert
-	);
+	const [ items, categories, collections, onSelectItem, workflows ] =
+		useBlockTypesState( rootClientId, onInsert );
 
 	const suggestedItems = useMemo( () => {
 		return orderBy( items, [ 'frecency' ], [ 'desc' ] ).slice(
@@ -101,6 +100,18 @@ export function BlockTypesTab( {
 	return (
 		<InserterListbox>
 			<div>
+				{ !! workflows?.length && (
+					// TODO - this isn't a very general title.
+					<InserterPanel title={ _x( 'Template Parts', 'blocks' ) }>
+						<WorkflowsList
+							rootClientId={ rootClientId }
+							items={ workflows }
+							onSelect={ onSelectItem }
+							label={ _x( 'Template Parts', 'blocks' ) }
+						/>
+					</InserterPanel>
+				) }
+
 				{ showMostUsedBlocks && !! suggestedItems.length && (
 					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
 						<BlockTypesList

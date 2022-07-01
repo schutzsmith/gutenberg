@@ -21,8 +21,8 @@ import { createTemplatePartId } from './create-template-part-id';
 /**
  * Retrieves the available template parts for the given area.
  *
- * @param {string} area       Template part area.
- * @param {string} excludedId Template part ID to exclude.
+ * @param {string}  area       Template part area.
+ * @param {string?} excludedId Template part ID to exclude.
  *
  * @return {{ templateParts: Array, isResolving: boolean }} array of template parts.
  */
