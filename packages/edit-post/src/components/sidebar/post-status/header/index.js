@@ -10,7 +10,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import {
-	PostStickyCheck,
 	PostPendingStatusCheck,
 	PostLastRevisionCheck,
 	PostTrashCheck,
@@ -19,7 +18,6 @@ import {
 /**
  * Internal dependencies
  */
-import PostSticky from './post-sticky';
 import PostPendingStatus from './post-pending-status';
 import PostLastRevision from './post-last-revision';
 import PostTrash from './post-trash';
@@ -39,9 +37,6 @@ export default function PostStatusHeader() {
 				{ () => (
 					<>
 						<MenuGroup>
-							<PostStickyCheck>
-								<PostSticky />
-							</PostStickyCheck>
 							<PostPendingStatusCheck>
 								<PostPendingStatus />
 							</PostPendingStatusCheck>
