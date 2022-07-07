@@ -1,13 +1,3 @@
-/**
- * WordPress dependencies
- */
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import CommentsInspectorControls from './edit/comments-inspector-controls';
-
 const TEMPLATE = [
 	[ 'core/comments-title' ],
 	[
@@ -88,24 +78,4 @@ const TEMPLATE = [
 	[ 'core/post-comments-form' ],
 ];
 
-export default function CommentsEdit( { attributes, setAttributes } ) {
-	const { tagName: TagName } = attributes;
-
-	const blockProps = useBlockProps( {
-		// We add the previous block name for backward compatibility.
-		className: 'wp-block-comments-query-loop',
-	} );
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-	} );
-
-	return (
-		<>
-			<CommentsInspectorControls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-			/>
-			<TagName { ...innerBlocksProps } />
-		</>
-	);
-}
+export default TEMPLATE;
