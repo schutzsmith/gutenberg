@@ -64,34 +64,34 @@ const UnconnectedBorderControl = (
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
-			<HStack spacing={ 3 }>
-				<HStack className={ innerWrapperClassName } alignment="stretch">
-					<BorderControlDropdown
-						border={ border }
-						colors={ colors }
-						__unstablePopoverProps={ __unstablePopoverProps }
-						disableCustomColors={ disableCustomColors }
-						enableAlpha={ enableAlpha }
-						enableStyle={ enableStyle }
-						onChange={ onBorderChange }
-						previousStyleSelection={ previousStyleSelection }
-						showDropdownHeader={ showDropdownHeader }
-						__experimentalHasMultipleOrigins={
-							__experimentalHasMultipleOrigins
-						}
-						__experimentalIsRenderedInSidebar={
-							__experimentalIsRenderedInSidebar
-						}
-						__next36pxDefaultSize={ __next36pxDefaultSize }
-					/>
-					<UnitControl
-						className={ widthControlClassName }
-						min={ 0 }
-						onChange={ onWidthChange }
-						value={ border?.width || '' }
-						placeholder={ placeholder }
-					/>
-				</HStack>
+			<HStack spacing={ 3 } className={ innerWrapperClassName }>
+				<UnitControl
+					prefix={
+						<BorderControlDropdown
+							border={ border }
+							colors={ colors }
+							__unstablePopoverProps={ __unstablePopoverProps }
+							disableCustomColors={ disableCustomColors }
+							enableAlpha={ enableAlpha }
+							enableStyle={ enableStyle }
+							onChange={ onBorderChange }
+							previousStyleSelection={ previousStyleSelection }
+							showDropdownHeader={ showDropdownHeader }
+							__experimentalHasMultipleOrigins={
+								__experimentalHasMultipleOrigins
+							}
+							__experimentalIsRenderedInSidebar={
+								__experimentalIsRenderedInSidebar
+							}
+							__next36pxDefaultSize={ __next36pxDefaultSize }
+						/>
+					}
+					className={ widthControlClassName }
+					min={ 0 }
+					onChange={ onWidthChange }
+					value={ border?.width || '' }
+					placeholder={ placeholder }
+				/>
 				{ withSlider && (
 					<RangeControl
 						className={ sliderClassName }
