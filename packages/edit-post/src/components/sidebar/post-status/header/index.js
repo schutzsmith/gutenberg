@@ -10,9 +10,9 @@ import {
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import {
-	PostPendingStatusCheck,
-	PostLastRevisionCheck,
-	PostTrashCheck,
+	usePostPendingStatusCheck,
+	usePostLastRevisionCheck,
+	usePostTrashCheck,
 } from '@wordpress/editor';
 
 /**
@@ -24,34 +24,44 @@ import PostTrash from './post-trash';
 
 // todo: should this whole component go in @wordpress/editor?
 export default function PostStatusHeader() {
+	const hasPostPendingStatus = usePostPendingStatusCheck();
+	const hasPostLastRevision = usePostLastRevisionCheck();
+	const hasPostTrash = usePostTrashCheck();
 	return (
 		<HStack className="edit-post-post-status__header">
 			<Heading className="edit-post-post-status__heading" level={ 2 }>
 				{ __( 'Summary' ) }
 			</Heading>
-			<DropdownMenu
-				icon={ moreVertical }
-				label={ __( 'Options' ) }
-				toggleProps={ { isSmall: true } }
-			>
-				{ () => (
-					<>
-						<MenuGroup>
-							<PostPendingStatusCheck>
-								<PostPendingStatus />
-							</PostPendingStatusCheck>
-							<PostLastRevisionCheck>
-								<PostLastRevision />
-							</PostLastRevisionCheck>
-						</MenuGroup>
-						<MenuGroup>
-							<PostTrashCheck>
-								<PostTrash />
-							</PostTrashCheck>
-						</MenuGroup>
-					</>
-				) }
-			</DropdownMenu>
+			{ ( hasPostPendingStatus ||
+				hasPostLastRevision ||
+				hasPostTrash ) && (
+				<DropdownMenu
+					icon={ moreVertical }
+					label={ __( 'Options' ) }
+					toggleProps={ { isSmall: true } }
+				>
+					{ () => (
+						<>
+							{ ( hasPostPendingStatus ||
+								hasPostLastRevision ) && (
+								<MenuGroup>
+									{ hasPostPendingStatus && (
+										<PostPendingStatus />
+									) }
+									{ hasPostLastRevision && (
+										<PostLastRevision />
+									) }
+								</MenuGroup>
+							) }
+							{ hasPostTrash && (
+								<MenuGroup>
+									<PostTrash />
+								</MenuGroup>
+							) }
+						</>
+					) }
+				</DropdownMenu>
+			) }
 		</HStack>
 	);
 }
