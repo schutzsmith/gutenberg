@@ -556,30 +556,6 @@ _Properties_
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
 
-### getInserterWorkflows
-
-Determines the worflows that appear in the inserter.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional root client ID of block list.
-
-_Returns_
-
--   `WPEditorInserterWorkflow[]`: Workflows that appear in inserter.
-
-_Type Definition_
-
--   _WPEditorInserterWorkflow_ `Object`
-
-_Properties_
-
--   _blockNAme_ `string`: The block name.
--   _id_ `string`: Unique identifier for the workflow.
--   _title_ `string`: Title of the item, as it appears in the inserter.
--   _icon_ `string`: Icon for the item, as it appears in the inserter.
-
 ### getLastMultiSelectedBlockClientId
 
 Returns the client ID of the last block in the multi-selection set, or null

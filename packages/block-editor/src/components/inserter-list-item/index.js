@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, useRef, memo } from '@wordpress/element';
+import {
+	useCallback,
+	memo,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
@@ -37,6 +43,7 @@ function isAppleOS( _window = window ) {
 }
 
 function InserterListItem( {
+	rootClientId,
 	className,
 	isFirst,
 	item,
@@ -45,6 +52,8 @@ function InserterListItem( {
 	isDraggable,
 	...props
 } ) {
+	const [ isInsertComponentVisible, setIsInsertComponentVisible ] =
+		useState( false );
 	const isDragging = useRef( false );
 	const itemIconStyle = item.icon
 		? {
@@ -71,85 +80,108 @@ function InserterListItem( {
 		item.initialAttributes,
 	] );
 
+	const { insert: Insert } = item;
+
+	const onSelectListItem = useCallback(
+		( event ) => {
+			if ( Insert ) {
+				setIsInsertComponentVisible( true );
+				onHover( null );
+			} else {
+				onSelect( item, isAppleOS() ? event.metaKey : event.ctrlKey );
+				onHover( null );
+			}
+		},
+		[ item, Insert ]
+	);
+
 	return (
-		<InserterDraggableBlocks
-			isEnabled={ isDraggable && ! item.disabled }
-			blocks={ draggableBlocks }
-			icon={ item.icon }
-		>
-			{ ( { draggable, onDragStart, onDragEnd } ) => (
-				<div
-					className="block-editor-block-types-list__list-item"
-					draggable={ draggable }
-					onDragStart={ ( event ) => {
-						isDragging.current = true;
-						if ( onDragStart ) {
-							onHover( null );
-							onDragStart( event );
-						}
-					} }
-					onDragEnd={ ( event ) => {
-						isDragging.current = false;
-						if ( onDragEnd ) {
-							onDragEnd( event );
-						}
-					} }
-				>
-					<InserterListboxItem
-						isFirst={ isFirst }
-						className={ classnames(
-							'block-editor-block-types-list__item',
-							className
-						) }
-						disabled={ item.isDisabled }
-						onClick={ ( event ) => {
-							event.preventDefault();
-							onSelect(
-								item,
-								isAppleOS() ? event.metaKey : event.ctrlKey
-							);
-							onHover( null );
-						} }
-						onKeyDown={ ( event ) => {
-							const { keyCode } = event;
-							if ( keyCode === ENTER ) {
-								event.preventDefault();
-								onSelect(
-									item,
-									isAppleOS() ? event.metaKey : event.ctrlKey
-								);
+		<>
+			<InserterDraggableBlocks
+				isEnabled={ isDraggable && ! item.disabled }
+				blocks={ draggableBlocks }
+				icon={ item.icon }
+			>
+				{ ( { draggable, onDragStart, onDragEnd } ) => (
+					<div
+						className="block-editor-block-types-list__list-item"
+						draggable={ draggable }
+						onDragStart={ ( event ) => {
+							isDragging.current = true;
+							if ( onDragStart ) {
 								onHover( null );
+								onDragStart( event );
 							}
 						} }
-						onFocus={ () => {
-							if ( isDragging.current ) {
-								return;
+						onDragEnd={ ( event ) => {
+							isDragging.current = false;
+							if ( onDragEnd ) {
+								onDragEnd( event );
 							}
-							onHover( item );
 						} }
-						onMouseEnter={ () => {
-							if ( isDragging.current ) {
-								return;
-							}
-							onHover( item );
-						} }
-						onMouseLeave={ () => onHover( null ) }
-						onBlur={ () => onHover( null ) }
-						{ ...props }
 					>
-						<span
-							className="block-editor-block-types-list__item-icon"
-							style={ itemIconStyle }
+						<InserterListboxItem
+							isFirst={ isFirst }
+							className={ classnames(
+								'block-editor-block-types-list__item',
+								className
+							) }
+							disabled={ item.isDisabled }
+							onClick={ ( event ) => {
+								event.preventDefault();
+								onSelectListItem( event );
+							} }
+							onKeyDown={ ( event ) => {
+								const { keyCode } = event;
+								if ( keyCode === ENTER ) {
+									event.preventDefault();
+									onSelectListItem( event );
+								}
+							} }
+							onFocus={ () => {
+								if ( isDragging.current ) {
+									return;
+								}
+								onHover( item );
+							} }
+							onMouseEnter={ () => {
+								if ( isDragging.current ) {
+									return;
+								}
+								onHover( item );
+							} }
+							onMouseLeave={ () => onHover( null ) }
+							onBlur={ () => onHover( null ) }
+							{ ...props }
 						>
-							<BlockIcon icon={ item.icon } showColors />
-						</span>
-						<span className="block-editor-block-types-list__item-title">
-							{ item.title }
-						</span>
-					</InserterListboxItem>
-				</div>
+							<span
+								className="block-editor-block-types-list__item-icon"
+								style={ itemIconStyle }
+							>
+								<BlockIcon icon={ item.icon } showColors />
+							</span>
+							<span className="block-editor-block-types-list__item-title">
+								{ item.title }
+							</span>
+						</InserterListboxItem>
+					</div>
+				) }
+			</InserterDraggableBlocks>
+			{ isInsertComponentVisible && (
+				<Insert
+					rootClientId={ rootClientId }
+					item={ item }
+					onSelect={ ( block, shouldFocusBlock ) => {
+						onSelect( block, shouldFocusBlock );
+						onHover( null );
+						setIsInsertComponentVisible( false );
+					} }
+					onCancel={ () => {
+						setIsInsertComponentVisible( false );
+					} }
+				/>
 			) }
-		</InserterDraggableBlocks>
+		</>
 	);
 }
 

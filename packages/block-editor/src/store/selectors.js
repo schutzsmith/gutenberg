@@ -1798,6 +1798,7 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 		innerBlocks: variation.innerBlocks,
 		keywords: variation.keywords || item.keywords,
 		frecency: calculateFrecency( time, count ),
+		insert: variation.insert,
 	};
 };
 
@@ -1881,6 +1882,7 @@ const buildBlockTypeItem =
 			variations: inserterVariations,
 			example: blockType.example,
 			utility: 1, // Deprecated.
+			insert: blockType.insert,
 		};
 	};
 
@@ -2038,56 +2040,6 @@ export const getInserterItems = createSelector(
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		getReusableBlocks( state ),
-		getBlockTypes(),
-	]
-);
-
-/**
- * Determines the worflows that appear in the inserter.
- *
- * @param    {Object}  state        Editor state.
- * @param    {?string} rootClientId Optional root client ID of block list.
- *
- * @return {WPEditorInserterWorkflow[]} Workflows that appear in inserter.
- *
- * @typedef {Object} WPEditorInserterWorkflow
- * @property {string}  blockNAme    The block name.
- * @property {string}  id           Unique identifier for the workflow.
- * @property {string}  title        Title of the item, as it appears in the inserter.
- * @property {string}  icon         Icon for the item, as it appears in the inserter.
- */
-export const getInserterWorkflows = createSelector(
-	( state, rootClientId = null ) => {
-		const inserterBlocksWithWorkflows = getBlockTypes().filter(
-			( blockType ) =>
-				blockType?.workflows?.length &&
-				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
-		);
-
-		if ( ! inserterBlocksWithWorkflows?.length ) {
-			return;
-		}
-
-		// Flatten the workflows for each block into a single array.
-		return inserterBlocksWithWorkflows?.reduce(
-			( workflowsAccumulator, blockType ) => [
-				...workflowsAccumulator,
-				// Omit the `flow` component, this is handled by the `Workflow` component.
-				...blockType.workflows.map( ( workflowProps ) => ( {
-					blockName: blockType.name,
-					...workflowProps,
-				} ) ),
-			],
-			[]
-		);
-	},
-	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId,
-		state.blocks.order,
-		state.preferences.insertUsage,
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
 		getBlockTypes(),
 	]
 );

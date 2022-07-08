@@ -14,7 +14,6 @@ import { useAsyncList } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockTypesList from '../block-types-list';
-import WorkflowsList from '../workflows-list';
 import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
@@ -37,8 +36,10 @@ export function BlockTypesTab( {
 	onHover,
 	showMostUsedBlocks,
 } ) {
-	const [ items, categories, collections, onSelectItem, workflows ] =
-		useBlockTypesState( rootClientId, onInsert );
+	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
+		rootClientId,
+		onInsert
+	);
 
 	const suggestedItems = useMemo( () => {
 		return orderBy( items, [ 'frecency' ], [ 'desc' ] ).slice(
@@ -100,21 +101,10 @@ export function BlockTypesTab( {
 	return (
 		<InserterListbox>
 			<div>
-				{ !! workflows?.length && (
-					// TODO - this isn't a very general title.
-					<InserterPanel title={ _x( 'Template Parts', 'blocks' ) }>
-						<WorkflowsList
-							rootClientId={ rootClientId }
-							items={ workflows }
-							onSelect={ onSelectItem }
-							label={ _x( 'Template Parts', 'blocks' ) }
-						/>
-					</InserterPanel>
-				) }
-
 				{ showMostUsedBlocks && !! suggestedItems.length && (
 					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
 						<BlockTypesList
+							rootClientId={ rootClientId }
 							items={ suggestedItems }
 							onSelect={ onSelectItem }
 							onHover={ onHover }
@@ -135,6 +125,7 @@ export function BlockTypesTab( {
 							icon={ category.icon }
 						>
 							<BlockTypesList
+								rootClientId={ rootClientId }
 								items={ categoryItems }
 								onSelect={ onSelectItem }
 								onHover={ onHover }
@@ -150,6 +141,7 @@ export function BlockTypesTab( {
 						title={ __( 'Uncategorized' ) }
 					>
 						<BlockTypesList
+							rootClientId={ rootClientId }
 							items={ uncategorizedItems }
 							onSelect={ onSelectItem }
 							onHover={ onHover }
@@ -173,6 +165,7 @@ export function BlockTypesTab( {
 								icon={ collection.icon }
 							>
 								<BlockTypesList
+									rootClientId={ rootClientId }
 									items={ collectionItems }
 									onSelect={ onSelectItem }
 									onHover={ onHover }

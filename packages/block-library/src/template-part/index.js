@@ -17,7 +17,6 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import metadata from './block.json';
 import edit from './edit';
-import workflows from './workflows';
 import { enhanceTemplatePartVariations } from './variations';
 
 const { name } = metadata;
@@ -46,7 +45,6 @@ export const settings = {
 		);
 	},
 	edit,
-	workflows,
 };
 
 // Importing this file includes side effects. This is added in block-library/package.json under sideEffects

@@ -22,17 +22,15 @@ import { store as blockEditorStore } from '../../../store';
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
 const useBlockTypesState = ( rootClientId, onInsert ) => {
-	const { categories, collections, items, workflows } = useSelect(
+	const { categories, collections, items } = useSelect(
 		( select ) => {
-			const { getInserterItems, getInserterWorkflows } =
-				select( blockEditorStore );
+			const { getInserterItems } = select( blockEditorStore );
 			const { getCategories, getCollections } = select( blocksStore );
 
 			return {
 				categories: getCategories(),
 				collections: getCollections(),
 				items: getInserterItems( rootClientId ),
-				workflows: getInserterWorkflows( rootClientId ),
 			};
 		},
 		[ rootClientId ]
@@ -51,7 +49,7 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 		[ onInsert ]
 	);
 
-	return [ items, categories, collections, onSelectItem, workflows ];
+	return [ items, categories, collections, onSelectItem ];
 };
 
 export default useBlockTypesState;

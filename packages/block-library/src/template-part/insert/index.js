@@ -46,12 +46,13 @@ function createTemplatePartPostData(
 	};
 }
 
-export default function NewTemplatePartWorkflow( {
-	area,
-	onFinish,
+export default function NewTemplatePartInsert( {
 	rootClientId,
+	item,
 	onSelect,
+	onCancel,
 } ) {
+	const area = item?.initialAttributes?.area;
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const areaObject = useTemplatePartArea( area );
 
@@ -81,7 +82,7 @@ export default function NewTemplatePartWorkflow( {
 				areaObject?.label.toLowerCase() ?? __( 'template part' )
 			) }
 			closeLabel={ __( 'Cancel' ) }
-			onRequestClose={ onFinish }
+			onRequestClose={ onCancel }
 		>
 			{ !! blockPatterns.length && (
 				<BlockPatternsList
@@ -89,7 +90,11 @@ export default function NewTemplatePartWorkflow( {
 					shownPatterns={ shownBlockPatterns }
 					onClickPattern={ async ( pattern, blocks ) => {
 						const templatePartPostData =
-							await createTemplatePartPostData( area, blocks );
+							await createTemplatePartPostData(
+								area,
+								blocks,
+								pattern.title
+							);
 
 						const templatePart = await saveEntityRecord(
 							'postType',
@@ -97,18 +102,15 @@ export default function NewTemplatePartWorkflow( {
 							templatePartPostData
 						);
 
-						const focusBlock = true;
-						onSelect(
-							{
-								name: 'core/template-part',
-								initialAttributes: {
-									slug: templatePart.slug,
-									theme: templatePart.theme,
-								},
+						const inserterItem = {
+							name: 'core/template-part',
+							initialAttributes: {
+								slug: templatePart.slug,
+								theme: templatePart.theme,
 							},
-							focusBlock
-						);
-						onFinish();
+						};
+						const focusBlock = true;
+						onSelect( inserterItem, focusBlock );
 					} }
 				/>
 			) }

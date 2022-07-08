@@ -10,6 +10,11 @@ import {
 	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import NewTemplatePartInsert from './insert';
+
 function getTemplatePartIcon( iconName ) {
 	if ( 'header' === iconName ) {
 		return headerIcon;
@@ -44,8 +49,13 @@ export function enhanceTemplatePartVariations( settings, name ) {
 		};
 
 		const variations = settings.variations.map( ( variation ) => {
+			const insert =
+				variation.name === 'header' || variation.name === 'footer'
+					? NewTemplatePartInsert
+					: undefined;
 			return {
 				...variation,
+				insert,
 				...( ! variation.isActive && { isActive } ),
 				...( typeof variation.icon === 'string' && {
 					icon: getTemplatePartIcon( variation.icon ),
