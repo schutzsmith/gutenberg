@@ -31,6 +31,7 @@ export {
 } from './border-box-control';
 export { BorderControl as __experimentalBorderControl } from './border-control';
 export { default as __experimentalBoxControl } from './box-control';
+export { default as __experimentalBoxControlIcon } from './box-control/icon';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
 export {
