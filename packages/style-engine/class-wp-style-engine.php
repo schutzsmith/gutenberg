@@ -394,7 +394,7 @@ class WP_Style_Engine {
 				}
 				$css_property        = $custom_css_property ? $custom_css_property : $style_property_keys['individual'];
 				$individual_property = sprintf( $css_property, _wp_to_kebab_case( $key ) );
-				if ( $value ) {
+				if ( static::is_valid_style_value( $style_value ) ) {
 					$css_declarations[ $individual_property ] = $value;
 				}
 			}
@@ -414,6 +414,7 @@ class WP_Style_Engine {
 	 * @param array $options      array(
 	 *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 	 *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
+	 *     'prettify'                   => (boolean) Whether to format the output with indents and new lines.
 	 * );.
 	 *
 	 * @return array|null array(
@@ -447,19 +448,24 @@ class WP_Style_Engine {
 		}
 
 		// Build CSS rules output.
-		$css_selector = isset( $options['selector'] ) ? $options['selector'] : null;
-		$style_rules  = new WP_Style_Engine_CSS_Declarations( $css_declarations );
+		$css_selector    = isset( $options['selector'] ) ? $options['selector'] : null;
+		$should_prettify = isset( $options['prettify'] ) ? $options['prettify'] : null;
+		$style_rules     = new WP_Style_Engine_CSS_Declarations( $css_declarations );
 
 		// The return object.
 		$styles_output = array();
-		$css           = $style_rules->get_declarations_string();
+		$css           = $style_rules->get_declarations_string( array( 'prettify' => $should_prettify ) );
 
 		// Return css, if any.
 		if ( ! empty( $css ) ) {
 			$styles_output['css'] = $css;
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
-				$styles_output['css'] = $css_selector . ' { ' . $css . ' }';
+				if ( $should_prettify ) {
+					$styles_output['css'] = $css_selector . ' {' . "\n" . $css . '}' . "\n";
+				} else {
+					$styles_output['css'] = $css_selector . ' { ' . $css . ' }';
+				}
 			}
 		}
 
@@ -483,48 +489,28 @@ class WP_Style_Engine {
 		$global_stylesheet = '';
 
 		// Layer 0: Root.
-		$root_level_styles = $this->get_block_supports_styles(
-			$global_styles,
-			array(
-				'selector'          => $css_selector,
-				'custom_properties' => array(
-					'spacing' => array(
-						'blockGap' => '--wp--style--block-gap',
-					),
+		$root_level_options_defaults = array(
+			'selector'          => 'body',
+			'custom_properties' => array(
+				'spacing' => array(
+					'blockGap' => '--wp--style--block-gap',
 				),
 			),
+		);
+		$root_level_options          = wp_parse_args( $options, $root_level_options_defaults );
+		$root_level_styles           = $this->get_block_supports_styles(
+			$global_styles,
+			$root_level_options,
 		);
 
 		if ( ! empty( $root_level_styles['css'] ) ) {
 			$global_stylesheet .= $root_level_styles['css'] . ' ';
 		}
 
-		/*
-		// Layer 1: Elements.
-		if ( isset( $global_styles['elements'] ) && is_array( $global_styles['elements'] ) ) {
-			foreach ( $global_styles['elements'] as $element_name => $element_styles ) {
-				$selector = isset( static::ELEMENTS[ $element_name ] ) ? static::ELEMENTS[ $element_name ] : null;
-				if ( ! $selector ) {
-					continue;
-				}
-				$element_level_styles = $this->get_block_supports_styles( $element_styles, array( 'selector' => $selector ) );
-				if ( ! empty( $element_level_styles['css'] ) ) {
-					$global_stylesheet .= $element_level_styles['css'] . ' ';
-				}
-			}
-		}
+		// @TODO Layer 1: Elements.
 
-		// Layer 2: Blocks.
-		if ( isset( $global_styles['blocks'] ) && is_array( $global_styles['blocks'] ) ) {
-			foreach ( $global_styles['blocks'] as $block_name => $block_styles ) {
-				$selector           = '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) );
-				$block_level_styles = $this->get_block_supports_styles( $block_styles, array( 'selector' => $selector ) );
-				if ( ! empty( $block_level_styles['css'] ) ) {
-					$global_stylesheet .= $block_level_styles['css'] . ' ';
-				}
-			}
-		}
-		*/
+		// @TODO Layer 2: Blocks.
+
 		if ( ! empty( $global_stylesheet ) ) {
 			return rtrim( $global_stylesheet );
 		}
