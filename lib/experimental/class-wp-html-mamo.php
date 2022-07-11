@@ -45,6 +45,7 @@ class WP_HTML_MaMo {
 
 	public function __construct( $input ) {
 		$this->input = $input;
+		$this->match_already_failed = true;
 	}
 
 	public function find( $descriptor ) {
@@ -58,6 +59,12 @@ class WP_HTML_MaMo {
 		$this->match_already_failed = false;
 
 		$this->match( 0 );
+	}
+
+	public function add_class( $class_name ) {
+		if ( $this->match_already_failed ) {
+			return false;
+		}
 	}
 
 	/**
@@ -96,7 +103,7 @@ class WP_HTML_MaMo {
 		}
 
 		list( 'INSIDE_TAG' => list( $inside_tag, $input_offset ) ) = $matches;
-		$next_attribute = "~[\u{09}\u{0a}\u{0c}\u{0d} ]*(?P<NAME>[a-z][-a-z0-9]*)(?P<VALUE>)~"i;
+		$next_attribute = "~[\u{09}\u{0a}\u{0c}\u{0d} ]*(?P<NAME>[a-z][-a-z0-9]*)(?P<VALUE>)~i";
 
 		// Narrow on match
 	}
@@ -135,5 +142,75 @@ class WP_HTML_MaMo {
 
 	public static function comparable( $input ) {
 		return strtolower( trim( $input ) );
+	}
+
+
+	/*
+	 * HTML scanning
+	 */
+
+
+	public function find_next_token(  ) {
+		if ( $this->parsing_state !== 'before-tag-open' ) {
+			$result = $this->find_next_tag_start( $this->start_at );
+			if ( $result['result'] === 'match' ) {
+				return $result;
+			}
+
+			return []
+		}
+
+
+		if ( 'no-match' === $result['result'] ) {
+			return null;
+		}
+
+		if ( $result['result'] === 'match' && $this->tag_name === $result['tag_name'] ) {
+			return $result;
+		}
+
+		// scan to end of attributes/tag
+		// repeat
+	}
+
+	public function find_next_tag_start( $start_at ) {
+		$matches = null;
+		$result = preg_match(
+			'~<!--(?>.*?-->)|<!\[CDATA\[(?>.*?>)|<\?(?>.*?)>|<(?P<TAG>[a-z][^\t\x{0A}\x{0C} \/>]*)~mui',
+			$this->input,
+			$matches,
+			PREG_OFFSET_CAPTURE,
+			$start_at
+		);
+
+		if ( 1 !== $result ) {
+			return [
+				'result' => 'no-match',
+				'next_state' => 'eof'
+			];
+		}
+
+		list( '0' => $full_match ) = $matches;
+
+		if ( ! isset( $matches['TAG'] ) ) {
+			return $this->find_next_tag_start( $start_at + strlen( $full_match ) );
+		}
+
+		list( 'TAG' => $tag_name ) = $matches;
+
+		return [
+			'result' => 'match',
+			'next_state' => 'after-tag-open',
+			'tag_name' => self::comparable( $tag_name ),
+			'start_at' => $start_at + strlen( $full_match )
+		];
+	}
+
+
+	public function next_token_before_attribute_name() {
+		$matches = null;
+		$result = preg_match(
+			'~~miu'
+		);
 	}
 }
