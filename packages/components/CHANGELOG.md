@@ -5,6 +5,7 @@
 ### Bug Fix
 
 -   `BoxControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#42094](https://github.com/WordPress/gutenberg/pull/42094)).
+-   `Popover`: call `getAnchorRect` callback prop even if `anchorRefFallback` has not a value. ([#42329](https://github.com/WordPress/gutenberg/pull/42329))
 
 ### Internal
 
